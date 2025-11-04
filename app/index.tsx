@@ -1,9 +1,8 @@
-import { Stack } from "expo-router";
+import { Link, Stack } from "expo-router";
 import { TouchableOpacity, Text, View, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "./components/CustomButton";
-import useTodos from "./hooks/useTodos";
-
+import { useTodos } from "./providers/TodosProvider";
 
 type ItemProps = {
   title: string
@@ -40,19 +39,23 @@ export default function Index() {
           data={todos}
           renderItem={({ item }) => <Item title={item.title} />}
           keyExtractor={item => item.id}
+          extraData={todos}
         />
 
-        <View className="flex-3 py-4 mb-4 items-center">
-          <CustomButton
-            title="Add"
-            onPress={handleAddTask}
-            className="bg-green-50"
-          />
-
+        <View className="flex-row py-4 mb-4 justify-around">
+          <Link
+            href="/add"
+            asChild>
+            <CustomButton
+              title="Add"
+              // onPress={handleAddTask}
+              className="bg-green-50"
+            />
+          </Link>
           <CustomButton
             title="Clear"
             onPress={handleClearTask}
-            className="bg-red-500"
+            className="bg-red-300"
           />
         </View>
       </SafeAreaView>
