@@ -1,17 +1,12 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   // NOTE: Update this to include the paths to all files that contain Nativewind classes.
-  content: [
-    "./App.tsx",
-    "./App.{js,jsx,ts,tsx}",
-    "./app/**/*.{js,jsx,ts,tsx}",
-    "./components/**/*.{js,jsx,ts,tsx}",
-  ],
+  content: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
       colors: {
-        primary: "#030014",
+        primary: "#009688", // Teal
         secondary: "#151312",
         light: {
           100: "#D6C6FF",
@@ -23,6 +18,15 @@ module.exports = {
           200: "#0f0d23",
         },
         accent: "#AB8BFF",
+        background: "#FFFFFF", // White
+        surface: "#F7F7F7", // OFF-white/light gray
+
+        "text-primary": "#212121", // Dark Gray
+        "text-secondary": "#757575", // Medium Gray
+
+        // Semantic colors
+        success: "#4CAF50", // Lime Green
+        warning: "#FF9800", // Orange
       },
     },
   },
