@@ -24,12 +24,22 @@ export default function addTaskScreen() {
         value={taskTitle}
         onChangeText={setTaskTitle}
         className="border border-gray-400 p-3 rounded-md w-full mb-6"
+        maxLength={10}
       />
-      <CustomButton
-        title="Save Task"
-        onPress={handleSaveTask}
-        className="bg-blue-600"
-      />
+
+      {taskTitle.length >= 10 && (
+        <Text className='text-sm text-red-600 mb-4'>
+          ⚠️ Maximum limit (10 characters) reached.
+        </Text>
+      )}
+
+      {taskTitle.length > 0 && (
+        <CustomButton
+          title="Save Task"
+          onPress={handleSaveTask}
+          className="bg-blue-600"
+        />
+      )}
     </View>
   )
 }
