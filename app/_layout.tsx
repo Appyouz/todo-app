@@ -6,7 +6,9 @@ export default function RootLayout() {
   return (
 
     <SafeAreaProvider>
-      <Stack />
+      <Stack
+        screenOptions={{ keepScreenOn: false }}
+      />
     </SafeAreaProvider>
   )
 }
