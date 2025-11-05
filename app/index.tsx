@@ -4,14 +4,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "./components/CustomButton";
 import { useTodos } from "./providers/TodosProvider";
 
+
 type ItemProps = {
+  id: string;
   title: string
 }
 
-const Item = ({ title }: ItemProps) => (
-  <View className="p-1 border-b border-gray-200">
-    <Text className="text-lg">{title}</Text>
-  </View>
+const Item = ({ id, title }: ItemProps) => (
+  <Link
+    href={{ pathname: "/edit", params: { id: id } }}
+    asChild
+  >
+    {/* <View className="p-1 border-b border-gray-200"> */}
+    <TouchableOpacity className="p-3 border-b border-gray-200">
+      <Text className="text-lg">{title}</Text>
+    </TouchableOpacity>
+  </Link>
 );
 
 export default function Index() {
@@ -37,7 +45,7 @@ export default function Index() {
         <Text className="text-3xl p-5"> Tasks: </Text>
         <FlatList
           data={todos}
-          renderItem={({ item }) => <Item title={item.title} />}
+          renderItem={({ item }) => <Item id={item.id} title={item.title} />}
           keyExtractor={item => item.id}
           extraData={todos}
         />

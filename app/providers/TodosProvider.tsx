@@ -18,7 +18,20 @@ const useTodosLogic = () => {
 
   const clearTodos = () => { setTodos([]); };
   const deleteTask = (id: string) => { /* logic */ };
-  const updateTask = (id: string) => { /* logic */ };
+  const updateTask = (id: string, newTitle: string) => {
+    setTodos((prevTodos) => {
+      return prevTodos.map((todo) => {
+        if (todo.id === id) {
+          return {
+            ...todo,
+            title: newTitle,
+          }
+        }
+        return todo;
+      })
+    })
+
+  };
 
   return { todos, addTask, deleteTask, updateTask, clearTodos };
 };
