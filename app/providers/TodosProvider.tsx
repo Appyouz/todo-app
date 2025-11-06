@@ -1,23 +1,52 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 type TodoItem = {
   id: string;
   title: string;
+  isArchived: boolean;
 };
 
 type TodosContextType = ReturnType<typeof useTodosLogic> | undefined;
+
+const STORAGE_KEY = '@TodoApp:todos';
 
 // State Logic
 const useTodosLogic = () => {
   const [todos, setTodos] = useState<TodoItem[]>([]);
 
   const addTask = (title: string) => {
-    const newTask: TodoItem = { id: Date.now().toString(), title: title };
+    const newTask: TodoItem = {
+      id: Date.now().toString(),
+      title: title,
+      isArchived: false,
+    };
     setTodos((prevTodos) => [...prevTodos, newTask]);
   };
 
+  const archiveTask = (id: string) => {
+    setTodos((prevTodos) => {
+      return prevTodos.map((todo) => {
+        if (todo.id === id) {
+          // Return a new object where isArchived status is True
+          return {
+            ...todo,
+            isArchived: true,
+          };
+        }
+        return todo;
+      })
+    })
+  }
+
+  const deleteArchivedTask = (id: string) => {
+    setTodos((prevTodos) => {
+      return prevTodos.filter((todo) => todo.isArchived === false)
+    })
+  };
+
   const clearTodos = () => { setTodos([]); };
-  const deleteTask = (id: string) => { /* logic */ };
   const updateTask = (id: string, newTitle: string) => {
     setTodos((prevTodos) => {
       return prevTodos.map((todo) => {
@@ -33,7 +62,42 @@ const useTodosLogic = () => {
 
   };
 
-  return { todos, addTask, deleteTask, updateTask, clearTodos };
+  // Persistence storage function
+  const saveTodos = async (currentTodos: TodoItem[]) => {
+    try {
+      const jsonValue = JSON.stringify(currentTodos)
+      await AsyncStorage.setItem(STORAGE_KEY, jsonValue)
+      console.log("Data successfully saved to AsyncStorage")
+    } catch (e) {
+      console.error("Failed to save todos.", e)
+    }
+  }
+
+  const loadTodos = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem(STORAGE_KEY)
+
+      if (jsonValue !== null) {
+        const loadedTodos = JSON.parse(jsonValue)
+        setTodos(loadedTodos)
+      }
+    } catch (e) {
+      console.error('Failed to load todos.', e);
+    }
+  }
+
+  // UseEffect Hooks for persistence 
+  // Load data on app startup
+  useEffect(() => {
+    loadTodos();
+  }, []);
+
+  // Save data whenever the 'todos' state changes
+  useEffect(() => {
+    saveTodos(todos)
+  }, [todos])
+
+  return { todos, addTask, archiveTask, deleteArchivedTask, updateTask, clearTodos };
 };
 
 // Context Setup
