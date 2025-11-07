@@ -20,6 +20,7 @@ type ItemProps = {
 type ItemFunctionProps = {
   archiveTask: (id: string) => void;
   updateTask: (id: string, newTitle: string) => void;
+  toggleComplete: (id: string) => void;
 }
 
 const renderRightActions = (id: string, archiveTask: (id: string) => void) => {
@@ -33,7 +34,7 @@ const renderRightActions = (id: string, archiveTask: (id: string) => void) => {
   );
 };
 
-const Item = ({ id, title, isCompleted, archiveTask, updateTask }: ItemProps & ItemFunctionProps) => {
+const Item = ({ id, title, isCompleted, archiveTask, updateTask, toggleComplete }: ItemProps & ItemFunctionProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
 
@@ -50,6 +51,19 @@ const Item = ({ id, title, isCompleted, archiveTask, updateTask }: ItemProps & I
       renderRightActions={() => renderRightActions(id, archiveTask)}
     >
       <View className="flex-row items-center p-3 border-b border-gray-200 justify-between">
+        <TouchableOpacity
+          onPress={() => toggleComplete(id)}
+          className="mr-3"
+          disabled={isEditing}
+        >
+          <Ionicons
+            name={isCompleted ? "checkmark-circle" : "ellipse-outline"}
+            size={24}
+            color={isCompleted ? "green" : "gray"}
+
+          ></Ionicons>
+        </TouchableOpacity>
+
         {isEditing ?
           <>
             <TextInput
@@ -78,7 +92,11 @@ const Item = ({ id, title, isCompleted, archiveTask, updateTask }: ItemProps & I
 
               {/*Edit Button*/}
               <TouchableOpacity
-                onPress={() => setIsEditing(true)}
+                onPress={() => {
+                  setEditTitle(title)
+                  setIsEditing(true)
+
+                }}
                 className="ml-4 p-1 rounded-full bg-gray-200"
               >
                 <Ionicons name="create-outline" size={20} color="gray" />
@@ -118,6 +136,7 @@ export default function Index() {
             isCompleted={item.isCompleted}
             archiveTask={archiveTask}
             updateTask={updateTask}
+            toggleComplete={toggleComplete}
           />}
           keyExtractor={item => item.id}
           extraData={todos}
