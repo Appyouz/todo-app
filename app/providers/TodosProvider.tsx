@@ -7,6 +7,9 @@ type TodoItem = {
   title: string;
   isArchived: boolean;
   isCompleted: boolean;
+
+  lastDurationMs: number | null;
+  failurReason: string | null;
 };
 
 type TodosContextType = ReturnType<typeof useTodosLogic> | undefined;
@@ -23,6 +26,8 @@ const useTodosLogic = () => {
       title: title,
       isArchived: false,
       isCompleted: false,
+      lastDurationMs: null,
+      failurReason: null,
     };
     setTodos((prevTodos) => [...prevTodos, newTask]);
   };
@@ -116,7 +121,38 @@ const useTodosLogic = () => {
   }
 
 
+  const completeFocusSession = (
+    id: string,
+    durationMs: number,
+    isSuccessful: boolean,
+    reason: string | null = null
+  ) => {
+    setTodos((prevTodos) => {
+      return prevTodos.map((todo) => {
+        if (todo.id === id) {
+          if (isSuccessful) {
+            return {
+              ...todo,
+              isCompleted: true,
+              isArchived: false,
+              lastDurationMs: durationMs,
+              failureReason: null,
+            };
+          } else {
+            return {
+              ...todo,
+              isCompleted: false,
+              isArchived: true,
+              lastDurationMs: durationMs,
+              failureReason: reason,
+            };
+          }
+        }
+        return todo;
+      })
+    })
 
+  }
 
   return {
     todos,
@@ -126,6 +162,7 @@ const useTodosLogic = () => {
     updateTask,
     clearTodos,
     toggleComplete,
+    completeFocusSession,
   };
 };
 

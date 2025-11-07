@@ -1,4 +1,4 @@
-import { Link, Stack } from "expo-router";
+import { Link, Stack, useRouter } from "expo-router";
 import { TouchableOpacity, Text, View, FlatList, TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "./components/CustomButton";
@@ -13,8 +13,9 @@ import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeabl
 
 type ItemProps = {
   id: string;
-  title: string
-  isCompleted: boolean,
+  title: string;
+  isCompleted: boolean;
+  lastDurationMs: number | null;
 }
 
 type ItemFunctionProps = {
@@ -34,23 +35,49 @@ const renderRightActions = (id: string, archiveTask: (id: string) => void) => {
   );
 };
 
-const Item = ({ id, title, isCompleted, archiveTask, updateTask, toggleComplete }: ItemProps & ItemFunctionProps) => {
+const formatDuration = (ms: number | null): string => {
+  if (ms === null || ms === 0) return '';
+
+  const seconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+
+  // Only display if minutes is greater than Zero
+  const minutePart = minutes > 0 ? `${minutes}m` : '';
+  const secondPart = `${remainingSeconds}`;
+
+  return `Duration: ${minutePart}${secondPart}`;
+}
+
+const Item = ({ id, title, isCompleted, lastDurationMs, archiveTask, updateTask, toggleComplete }: ItemProps & ItemFunctionProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
 
   const handleSaveEdit = () => {
     const trimmedTitle = editTitle.trim();
     if (trimmedTitle.length > 0 && trimmedTitle !== title) {
-      updateTask(id, trimmedTitle)
+      updateTask(id, trimmedTitle);
     }
-    setIsEditing(false)
-  }
+    setIsEditing(false);
+  };
+
+  const router = useRouter();
+  const handleStartFocus = () => {
+    if (!isCompleted) {
+      router.push({
+        pathname: "/focus",
+        params: { id: id },
+      });
+    }
+  };
 
   return (
-    < ReanimatedSwipeable
+    <ReanimatedSwipeable
       renderRightActions={() => renderRightActions(id, archiveTask)}
     >
       <View className="flex-row items-center p-3 border-b border-gray-200 justify-between">
+
+        {/* Toggle complete (Always Visible, unless editing) */}
         <TouchableOpacity
           onPress={() => toggleComplete(id)}
           className="mr-3"
@@ -60,11 +87,11 @@ const Item = ({ id, title, isCompleted, archiveTask, updateTask, toggleComplete 
             name={isCompleted ? "checkmark-circle" : "ellipse-outline"}
             size={24}
             color={isCompleted ? "green" : "gray"}
-
-          ></Ionicons>
+          />
         </TouchableOpacity>
 
-        {isEditing ?
+        {isEditing ? (
+          /* Editing mode: TextInput and Save Button */
           <>
             <TextInput
               value={editTitle}
@@ -82,35 +109,43 @@ const Item = ({ id, title, isCompleted, archiveTask, updateTask, toggleComplete 
               <Ionicons name="checkmark-circle-sharp" size={24} color="white" />
             </TouchableOpacity>
           </>
-          : (
-            <>
-              {/*Strikethrough*/}
-
-              <Text className={`text-lg flex-1 ${isCompleted ? 'line-through text-gray-500 italic' : ''}`}>
+        ) : (
+          /* Display Mode : Main Focus Target and Edit Button */
+          <>
+            {/* Focus Target : Touchable area for the title */}
+            <TouchableOpacity
+              onPress={handleStartFocus}
+              className="flex-1 py-1"
+              activeOpacity={0.7}
+            >
+              {/* Title Text with Strike-through */}
+              <Text className={`text-lg ${isCompleted ? 'line-through text-gray-500 italic' : ''}`}>
                 {title}
               </Text>
+              {/*display duration if completed*/}
+              {isCompleted && lastDurationMs !== null && (
+                <Text className="text-sm text-green-600 mt-0.5">
+                  {formatDuration(lastDurationMs)}
+                </Text>
+              )}
+            </TouchableOpacity>
 
-              {/*Edit Button*/}
-              <TouchableOpacity
-                onPress={() => {
-                  setEditTitle(title)
-                  setIsEditing(true)
-
-                }}
-                className="ml-4 p-1 rounded-full bg-gray-200"
-              >
-                <Ionicons name="create-outline" size={20} color="gray" />
-              </TouchableOpacity>
-            </>
-          )
-        }
+            {/* Edit Button*/}
+            <TouchableOpacity
+              onPress={() => {
+                setEditTitle(title);
+                setIsEditing(true);
+              }}
+              className="ml-4 p-1 rounded-full bg-gray-200"
+            >
+              <Ionicons name="create-outline" size={20} color="gray" />
+            </TouchableOpacity>
+          </>
+        )}
       </View>
-
-      {/* <View className="p-1 border-b border-gray-200"> */}
-    </ReanimatedSwipeable >
+    </ReanimatedSwipeable>
   );
 };
-
 export default function Index() {
   const { todos, archiveTask, deleteArchivedTask, updateTask, clearTodos, toggleComplete } = useTodos()
 
@@ -134,6 +169,7 @@ export default function Index() {
           renderItem={({ item }) => <Item id={item.id}
             title={item.title}
             isCompleted={item.isCompleted}
+            lastDurationMs={item.lastDurationMs}
             archiveTask={archiveTask}
             updateTask={updateTask}
             toggleComplete={toggleComplete}
