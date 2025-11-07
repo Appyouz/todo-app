@@ -9,7 +9,7 @@ type TodoItem = {
   isCompleted: boolean;
 
   lastDurationMs: number | null;
-  failurReason: string | null;
+  failureReason: string | null;
 };
 
 type TodosContextType = ReturnType<typeof useTodosLogic> | undefined;
@@ -27,7 +27,7 @@ const useTodosLogic = () => {
       isArchived: false,
       isCompleted: false,
       lastDurationMs: null,
-      failurReason: null,
+      failureReason: null,
     };
     setTodos((prevTodos) => [...prevTodos, newTask]);
   };
@@ -154,6 +154,24 @@ const useTodosLogic = () => {
 
   }
 
+  const restoreTask = (taskId: string) => {
+    setTodos((prevTodos) =>
+      prevTodos.map((todo) => todo.id === taskId ?
+        {
+          ...todo,
+          isArchived: false,
+          isCompleted: false,
+          lastDurationMs: null,
+          failureReason: null,
+        }
+        : todo
+      )
+    )
+
+  }
+
+
+
   return {
     todos,
     addTask,
@@ -163,6 +181,7 @@ const useTodosLogic = () => {
     clearTodos,
     toggleComplete,
     completeFocusSession,
+    restoreTask,
   };
 };
 

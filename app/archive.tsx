@@ -1,52 +1,131 @@
-import { Text, View, FlatList } from 'react-native';
+import { Text, View, FlatList, TouchableOpacity } from 'react-native';
 import { useTodos } from './providers/TodosProvider';
+import { Stack } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CustomButton from './components/CustomButton';
 import React from 'react';
+import { formatDuration } from './utils';
 
-const ArchivedItem = ({ title }: { title: string }) => (
-  <View className="p-3 border-b border-gray-200 bg-gray-100 opacity-60">
-    <Text className="text-lg italic text-gray-700">{title}</Text>
-  </View>
-)
+
+// Type Definition for the data display
+type ArchivedItemProps = {
+  id: string;
+  title: string;
+  isCompleted: boolean;
+  lastDurationMs: number | null;
+  failureReason: string | null;
+  deleteTask: (id: string) => void;
+  restoreTask: (id: string) => void;
+};
+
+// ArchivedItem component to display all tracking data and buttons
+const ArchivedItem = ({ id, title, isCompleted, lastDurationMs, failureReason, deleteTask, restoreTask }: ArchivedItemProps) => {
+  return (
+    <View className="p-4 border border-gray-700 bg-gray-800 mb-4 rounded-lg shadow-md">
+
+      {/* Title and Action Buttons */}
+      <View className="flex-row justify-between items-start mb-3">
+        <Text className={`flex-1 text-xl font-bold ${isCompleted ? 'text-green-300' : 'text-red-300'}`}>
+          {title}
+        </Text>
+
+        <View className="flex-row space-x-2 ml-4">
+          {/* Restore Button (for Failed tasks) */}
+          {!isCompleted && (
+            <TouchableOpacity onPress={() => restoreTask(id)} className="p-2 bg-blue-600 rounded-md">
+              <Ionicons name="repeat-outline" size={20} color="white" />
+            </TouchableOpacity>
+          )}
+
+          {/* Delete Button */}
+          <TouchableOpacity onPress={() => deleteTask(id)} className="p-2 bg-red-600 rounded-md">
+            <Ionicons name="trash-outline" size={20} color="white" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Status and Duration Row */}
+      <View className="flex-row justify-start items-center space-x-4 mb-2">
+        <Text className={`text-sm font-semibold ${isCompleted ? 'text-green-400' : 'text-red-400'}`}>
+          <Ionicons name={isCompleted ? "checkmark-circle" : "close-circle"} size={16} />
+          {' '}
+          {isCompleted ? 'Completed' : 'Failed Focus'}
+        </Text>
+
+        {lastDurationMs !== null && lastDurationMs > 0 && (
+          <Text className="text-sm text-gray-400">
+            <Ionicons name="time-outline" size={14} color="gray" /> {formatDuration(lastDurationMs)}
+          </Text>
+        )}
+      </View>
+
+      {/* Failure Reason Display (Only for failed tasks) */}
+      {!isCompleted && failureReason && (
+        <View className="mt-2 p-3 border-l-4 border-red-500 bg-gray-700 rounded-sm">
+          <Text className="text-sm font-bold text-gray-300 mb-1">Reason for Failure:</Text>
+          <Text className="text-sm text-gray-200 italic">{failureReason}</Text>
+        </View>
+      )}
+
+    </View>
+  );
+};
+
 
 export default function ArchiveScreen() {
-  const { todos, deleteArchivedTask } = useTodos()
+  // Destructure the new restoreTask function here
+  const { todos, deleteArchivedTask, restoreTask } = useTodos();
+  const archivedTodos = todos.filter(task => task.isArchived);
 
-  const archivedTodos = todos.filter(task => task.isArchived === true)
-
-  const handleDeleteArchived = () => {
-    deleteArchivedTask()
+  // Function to delete ALL archived tasks
+  const handleDeleteAllArchived = () => {
+    deleteArchivedTask();
   }
+
   return (
-    <SafeAreaView className="flex-1 px-4">
-      <View className="py-4 mb-4 items-center">
-        <Text className="text-4xl font-bold text-gray-700">Task Archive</Text>
-        <Text className="text-sm text-gray-500 mt-2">
+    <SafeAreaView className="flex-1 bg-gray-900">
+      {/* Set Stack options to style the header, if needed */}
+      <Stack.Screen options={{ title: 'Task Archive', headerTitleStyle: { color: 'white' }, headerStyle: { backgroundColor: '#1f2937' } }} />
+
+      <View className="py-4 px-4 mb-4 items-center">
+        <Text className="text-4xl font-bold text-white">Task Archive</Text>
+        <Text className="text-sm text-gray-400 mt-2">
           Total Archived: {archivedTodos.length}
         </Text>
       </View>
 
-      {/* Conditional Rendering for Empty Archive */}
-      {archivedTodos.length === 0 ? (
-        <View className="flex-1 justify-center items-center">
-          <Text className="text-xl text-gray-400">The archive is empty!</Text>
-        </View>
-      ) : (
-        // 3. Display the filtered list
-        <FlatList
-          data={archivedTodos} // 💡 Use the filtered list
-          renderItem={({ item }) => <ArchivedItem title={item.title} />}
-          keyExtractor={item => item.id}
-        />
-      )}
+      <View className="flex-1 px-4">
+        {/* Conditional Rendering for Empty Archive */}
+        {archivedTodos.length === 0 ? (
+          <View className="flex-1 justify-center items-center">
+            <Text className="text-xl text-gray-500">The archive is empty!</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={archivedTodos}
+            renderItem={({ item }) => (
+              <ArchivedItem
+                id={item.id}
+                title={item.title}
+                isCompleted={item.isCompleted}
+                lastDurationMs={item.lastDurationMs}
+                failureReason={item.failureReason}
+                deleteTask={deleteArchivedTask}
+                restoreTask={restoreTask}
+              />
+            )}
+            keyExtractor={item => item.id}
+          />
+        )}
+      </View>
 
-      {/* Delete Button */}
+      {/* Delete All Button (remains at the bottom) */}
       {archivedTodos.length > 0 && (
-        <View className="py-4">
+        <View className="py-4 px-4">
           <CustomButton
             title="Permanently Delete All Archived"
-            onPress={handleDeleteArchived} // 💡 Wired to the delete logic
+            onPress={handleDeleteAllArchived}
             className="bg-red-500"
           />
         </View>

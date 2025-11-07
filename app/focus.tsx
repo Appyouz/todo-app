@@ -121,7 +121,6 @@ export default function FocusScreen() {
       keyboardShouldPersistTaps="handled"
       enableOnAndroid={true}
       extraScrollHeight={100}
-      // Set class name for padding/background
       className="flex-1 bg-gray-900"
     >
       <View className="flex-1 p-6 bg-gray-900 justify-around items-center">

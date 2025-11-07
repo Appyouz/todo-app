@@ -5,10 +5,8 @@ import CustomButton from "./components/CustomButton";
 import { useTodos } from "./providers/TodosProvider";
 import React, { useState } from "react";
 import { Ionicons } from '@expo/vector-icons'
-
-
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
-
+import { formatDuration } from './utils';
 
 
 type ItemProps = {
@@ -35,19 +33,6 @@ const renderRightActions = (id: string, archiveTask: (id: string) => void) => {
   );
 };
 
-const formatDuration = (ms: number | null): string => {
-  if (ms === null || ms === 0) return '';
-
-  const seconds = Math.floor(ms / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-
-  // Only display if minutes is greater than Zero
-  const minutePart = minutes > 0 ? `${minutes}m` : '';
-  const secondPart = `${remainingSeconds}`;
-
-  return `Duration: ${minutePart}${secondPart}`;
-}
 
 const Item = ({ id, title, isCompleted, lastDurationMs, archiveTask, updateTask, toggleComplete }: ItemProps & ItemFunctionProps) => {
   const [isEditing, setIsEditing] = useState(false);
