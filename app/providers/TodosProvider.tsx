@@ -6,6 +6,7 @@ type TodoItem = {
   id: string;
   title: string;
   isArchived: boolean;
+  isCompleted: boolean;
 };
 
 type TodosContextType = ReturnType<typeof useTodosLogic> | undefined;
@@ -21,6 +22,7 @@ const useTodosLogic = () => {
       id: Date.now().toString(),
       title: title,
       isArchived: false,
+      isCompleted: false,
     };
     setTodos((prevTodos) => [...prevTodos, newTask]);
   };
@@ -97,7 +99,34 @@ const useTodosLogic = () => {
     saveTodos(todos)
   }, [todos])
 
-  return { todos, addTask, archiveTask, deleteArchivedTask, updateTask, clearTodos };
+
+  // ToggleComplete
+  const toggleComplete = (id: string) => {
+    setTodos((prevTodos) => {
+      return prevTodos.map((todo) => {
+        if (todo.id === id) {
+          return {
+            ...todo,
+            isCompleted: !todo.isCompleted
+          }
+        }
+        return todo;
+      })
+    })
+  }
+
+
+
+
+  return {
+    todos,
+    addTask,
+    archiveTask,
+    deleteArchivedTask,
+    updateTask,
+    clearTodos,
+    toggleComplete,
+  };
 };
 
 // Context Setup
