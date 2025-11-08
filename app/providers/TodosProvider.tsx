@@ -47,7 +47,12 @@ const useTodosLogic = () => {
     })
   }
 
-  const deleteArchivedTask = (id: string) => {
+  const deleteArchivedTaskById = (id: string) => {
+    setTodos((prevTodos) => {
+      return prevTodos.filter((todo) => todo.id !== id);
+    })
+  };
+  const deleteAllArchivedTask = () => {
     setTodos((prevTodos) => {
       return prevTodos.filter((todo) => todo.isArchived === false)
     })
@@ -176,7 +181,8 @@ const useTodosLogic = () => {
     todos,
     addTask,
     archiveTask,
-    deleteArchivedTask,
+    deleteArchivedTaskById,
+    deleteAllArchivedTask,
     updateTask,
     clearTodos,
     toggleComplete,

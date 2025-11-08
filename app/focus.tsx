@@ -4,6 +4,8 @@ import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import { useTodos } from './providers/TodosProvider';
 import React, { useEffect, useState } from 'react';
 import CustomButton from './components/CustomButton';
+import * as Haptics from 'expo-haptics'
+
 
 const MAX_FOCUS_TIME_MINUTES = 1;
 
@@ -75,6 +77,7 @@ export default function FocusScreen() {
   // Success Handler
   const handleFinishTask = () => {
     setIsRunning(false)
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
     // Calcuate duration
     const initialTimeSeconds = MAX_FOCUS_TIME_MINUTES * 60;
@@ -97,6 +100,7 @@ export default function FocusScreen() {
   // Failure handler
   const handleGiveUp = () => {
     setIsRunning(false);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
     const initialTimeSeconds = MAX_FOCUS_TIME_MINUTES * 60;
     const secondsSpent = initialTimeSeconds - timeLeft;

@@ -1,11 +1,12 @@
-import { Text, View, FlatList, TouchableOpacity } from 'react-native';
+import { Text, View, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { useTodos } from './providers/TodosProvider';
 import { Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CustomButton from './components/CustomButton';
 import React from 'react';
-import { formatDuration } from './utils';
+import { formatDuration } from './lib/utils';
+import * as Haptics from 'expo-haptics'
 
 
 // Type Definition for the data display
@@ -75,12 +76,34 @@ const ArchivedItem = ({ id, title, isCompleted, lastDurationMs, failureReason, d
 
 export default function ArchiveScreen() {
   // Destructure the new restoreTask function here
-  const { todos, deleteArchivedTask, restoreTask } = useTodos();
+  const { todos, deleteArchivedTaskById, deleteAllArchivedTask, restoreTask } = useTodos();
   const archivedTodos = todos.filter(task => task.isArchived);
 
   // Function to delete ALL archived tasks
   const handleDeleteAllArchived = () => {
-    deleteArchivedTask();
+    Alert.alert(
+      "Confirm Permanent Detection",
+      "Are you absolutely sure you want to Permanently delete All archived tasks? This action cannot be undone.",
+      [
+        // Option 1: For cancel
+        {
+          text: "Cancel",
+          style: "cancel",
+          onPress: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
+
+        },
+        // Option 2 Delete
+        {
+          text: "DELETE ALL",
+          style: "destructive",
+          onPress: () => {
+            deleteAllArchivedTask()
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning)
+          }
+        },
+      ],
+      { cancelable: true }
+    )
   }
 
   return (
@@ -111,7 +134,7 @@ export default function ArchiveScreen() {
                 isCompleted={item.isCompleted}
                 lastDurationMs={item.lastDurationMs}
                 failureReason={item.failureReason}
-                deleteTask={deleteArchivedTask}
+                deleteTask={() => deleteArchivedTaskById(item.id)}
                 restoreTask={restoreTask}
               />
             )}

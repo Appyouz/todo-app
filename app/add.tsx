@@ -1,8 +1,9 @@
-import { Text, TextInput, View } from 'react-native'
+import { Text, TextInput, View, Alert } from 'react-native'
 import { useState } from 'react'
 import { useRouter } from 'expo-router';
 import { useTodos } from "./providers/TodosProvider";
 import CustomButton from './components/CustomButton';
+import * as Haptics from 'expo-haptics';
 
 export default function addTaskScreen() {
   const [taskTitle, setTaskTitle] = useState('')
@@ -11,14 +12,22 @@ export default function addTaskScreen() {
   const router = useRouter()
 
   const handleSaveTask = () => {
-    if (taskTitle.trim().length > 0) {
-      addTask(taskTitle)
+    const trimmedTitle = taskTitle.trim();
+    if (trimmedTitle.length > 0) {
+      addTask(trimmedTitle)
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.back()
+    } else {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(
+        "Invalid Task Title",
+        "Task title cannot be empty or contain only spaces. Please enter a valid description."
+      );
     }
   }
 
   return (
-    <View className='flex-1 justify-center align-center'>
+    <View className='flex-1 justify-center align-center p-4'>
       <TextInput
         placeholder='Enter your new task'
         value={taskTitle}

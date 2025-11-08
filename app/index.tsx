@@ -6,7 +6,8 @@ import { useTodos } from "./providers/TodosProvider";
 import React, { useState } from "react";
 import { Ionicons } from '@expo/vector-icons'
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
-import { formatDuration } from './utils';
+import { formatDuration } from './lib/utils';
+import * as Haptics from 'expo-haptics';
 
 
 type ItemProps = {
@@ -56,6 +57,12 @@ const Item = ({ id, title, isCompleted, lastDurationMs, archiveTask, updateTask,
     }
   };
 
+  const handleToggleComplete = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    toggleComplete(id);
+  }
+
+
   return (
     <ReanimatedSwipeable
       renderRightActions={() => renderRightActions(id, archiveTask)}
@@ -64,7 +71,7 @@ const Item = ({ id, title, isCompleted, lastDurationMs, archiveTask, updateTask,
 
         {/* Toggle complete (Always Visible, unless editing) */}
         <TouchableOpacity
-          onPress={() => toggleComplete(id)}
+          onPress={handleToggleComplete}
           className="mr-3"
           disabled={isEditing}
         >
