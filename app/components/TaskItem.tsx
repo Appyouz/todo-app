@@ -6,7 +6,7 @@ import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeabl
 import * as Haptics from 'expo-haptics';
 import { formatDuration } from '../lib/utils';
 
-const CHAR_LIMIT = 20;
+const CHAR_LIMIT = 45;
 
 type ItemProps = {
   id: string;
