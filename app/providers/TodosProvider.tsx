@@ -176,6 +176,20 @@ const useTodosLogic = () => {
   }
 
 
+  const archiveCompletedTasks = () => {
+    setTodos((prevTodos) => {
+      return prevTodos.map((todo) => {
+        if (todo.isCompleted && !todo.isArchived) {
+          return {
+            ...todo,
+            isArchived: true,
+          }
+        }
+        return todo;
+      })
+    })
+  }
+
 
   return {
     todos,
@@ -188,6 +202,7 @@ const useTodosLogic = () => {
     toggleComplete,
     completeFocusSession,
     restoreTask,
+    archiveCompletedTasks,
   };
 };
 
