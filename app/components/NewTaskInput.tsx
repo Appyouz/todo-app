@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTodos } from '../providers/TodosProvider';
 
-const CHAR_LIMIT = 20;
+const CHAR_LIMIT = 45;
 
 type NewTaskInputProps = {
   showInput: boolean;
