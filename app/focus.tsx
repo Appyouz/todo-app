@@ -2,7 +2,7 @@ import { Text, View, TextInput, BackHandler } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import { useTodos } from './providers/TodosProvider';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import CustomButton from './components/CustomButton';
 import * as Haptics from 'expo-haptics'
 
@@ -18,8 +18,8 @@ export default function FocusScreen() {
 
 
   // Initial State Setup
-  const [timeLeft, setTimeLeft] = React.useState(MAX_FOCUS_TIME_MINUTES * 60);
-  const [isRunning, setIsRunning] = React.useState(true)
+  const [timeLeft, setTimeLeft] = useState(MAX_FOCUS_TIME_MINUTES * 60);
+  const [isRunning, setIsRunning] = useState(true)
   const [failureReason, setFailureReason] = useState('');
   const [isFailed, setIsFailed] = useState(false);
 
@@ -45,7 +45,7 @@ export default function FocusScreen() {
   const router = useRouter();
 
   // Logic for navigation block
-  React.useEffect(() => {
+  useEffect(() => {
     // Function to prevent hardware back button press for (Android)
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
@@ -58,7 +58,7 @@ export default function FocusScreen() {
 
 
   // Timer logic
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isRunning || timeLeft <= 0) {
       if (timeLeft <= 0) {
         console.log("Time's up! Focus session ended.");

@@ -1,7 +1,3 @@
-/**
- * Formats duration in milliseconds to a human-readable string (e.g., "20m 15s").
- * Returns an empty string if the duration is null or zero.
- */
 export const formatDuration = (ms: number | null): string => {
   if (ms === null || ms === 0) return "";
 
