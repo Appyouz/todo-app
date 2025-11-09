@@ -108,7 +108,7 @@ export default function Index() {
               setShowInput(!showInput);
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
             }}
-            className={showInput ? "bg-red-300" : "bg-green-300"}
+            className={showInput ? "bg-red-600" : "bg-green-400"}
           />
 
           <Link
@@ -117,14 +117,14 @@ export default function Index() {
           >
             <CustomButton
               title="Archive"
-              className="bg-yellow-200"
+              className="bg-yellow-500"
             />
           </Link>
 
           <CustomButton
             title="Clear"
             onPress={handleClearTask}
-            className="bg-red-300"
+            className="bg-red-600"
           />
         </View>
       </SafeAreaView >

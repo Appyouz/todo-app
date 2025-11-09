@@ -173,7 +173,7 @@ export default function FocusScreen() {
           <CustomButton
             title="I Finished!"
             onPress={handleFinishTask}
-            className="bg-green-600 w-3/4"
+            className="bg-blue-600 w-3/4"
             disabled={timeLeft <= 0}
           />
         )}
